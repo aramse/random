@@ -1,0 +1,137 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: abc
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: view
+subjects:
+- kind: ServiceAccount
+  name: abc
+  namespace: abc
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: abc2
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: abc2
+  namespace: abc2
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: cron
+spec:
+  concurrencyPolicy: Allow
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - command:
+            - /bin/sh
+            - -c
+            - date
+            env:
+            - name: MY_ENV
+              value: prod
+            image: centos
+            name: cron
+            volumeMounts: []
+          restartPolicy: OnFailure
+  schedule: 0 * * * *
+  successfulJobsHistoryLimit: 3
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+spec:
+  replicas: 2
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: api
+  template:
+    spec:
+      metadata:
+        labels:
+          app: api
+      containers:
+      - image: gcr.io/foobar/abc/api:latest
+        name: api
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 1781
+        resources:
+          limits:
+            cpu: 0.35
+            memory: 128Mi
+          requests:
+            cpu: 0.25
+            memory: 128Mi
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: api2
+spec:
+  replicas: 2
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: api2
+  template:
+    spec:
+      metadata:
+        labels:
+          app: api2
+      containers:
+      - image: gcr.io/foobar/abc/api:latest
+        name: api2
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 1781
+        resources:
+          limits:
+            cpu: 0.35
+            memory: 128Mi
+          requests:
+            cpu: 0.25
+            memory: 128Mi
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: api
+spec:
+  maxReplicas: 3
+  minReplicas: 2
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: api
+  targetCPUUtilizationPercentage: 85
+---
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: api2
+spec:
+  maxReplicas: 3
+  minReplicas: 2
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: api2
+  targetCPUUtilizationPercentage: 85

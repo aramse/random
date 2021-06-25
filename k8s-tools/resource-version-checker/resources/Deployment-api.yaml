@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+spec:
+  replicas: 2
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: api
+  template:
+    spec:
+      metadata:
+        labels:
+          app: api
+      containers:
+      - image: gcr.io/foobar/abc/api:latest
+        name: api
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 1781
+        resources:
+          limits:
+            cpu: 0.35
+            memory: 128Mi
+          requests:
+            cpu: 0.25
+            memory: 128Mi
