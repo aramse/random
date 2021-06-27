@@ -3,7 +3,7 @@
 ## Summary
 Kubernetes API resource versions can be deprecated with every release, however your Kubernetes cluster will not warn you when deploying a deprecated or alpha/beta resource.
 
-This tool scans files for defined Kubernetes resources, compares the API version for each against the current/recommended version according to the Kubernetes API server (via `kubectl explain`), and reports on any differences.
+This tool scans files for defined Kubernetes resources, compares the API version for each against the current/recommended version according to the Kubernetes API server, and reports on any differences.
 
 ### Prerequisites
 - [yq](https://github.com/kislyuk/yq) (a yaml wrapper for `jq`) and [kubectl](https://kubernetes.io/docs/tasks/tools/) are installed
