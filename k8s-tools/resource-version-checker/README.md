@@ -19,7 +19,7 @@ Use this tool by simply running the following command from this directory, optio
 The output will be similar to the following:
 
 ```
- $ ./check.sh
+$  ./check.sh
 
 Checking version support for resources defined in files in directory: resources
 
