@@ -1,9 +1,13 @@
 # Kubernetes Resource Version Checker
 
-## Background
-Supported Kubernetes API resource versions can change with every release.
+## Summary
+Kubernetes API resource versions can be deprecated with every release, however your Kubernetes cluster will not warn you when deploying a deprecated or alpha/beta resource.
 
-This tool scans files for defined Kubernetes resources, compares the defined API version for each with the current/recommended version according to the Kubernetes API server (via `kubectl explain`), and reports on any differences.
+This tool scans files for defined Kubernetes resources, compares the API version for each against the current/recommended version according to the Kubernetes API server (via `kubectl explain`), and reports on any differences.
+
+### Prerequisites
+- [yq](https://github.com/kislyuk/yq) (a yaml wrapper for `jq`) and [kubectl](https://kubernetes.io/docs/tasks/tools/) are installed
+- `kubectl` is configured to point to the Kubernetes cluster you would like to query for recommended resource versions
 
 ## Usage
 Use this tool by simply running the following command from this directory, optionally supplying a directory in which to scan for Kubernetes resource manifests (defaults to `resources`).
